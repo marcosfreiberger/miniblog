@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import { useAuthValue } from "../../context/AuthContext";
+import { useInsertDocument } from "../../hooks/useInsertDocument";
 import styles from "./CreatePost.module.css";
 
 const CreatePost = () => {
@@ -8,8 +10,23 @@ const CreatePost = () => {
   const [tags, setTags] = useState([]);
   const [formError, setFormError] = useState("");
 
+  const { user } = useAuthValue();
+
+  const { insertDocument, response } = useInsertDocument("posts");
+
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    setFormError("");
+
+    insertDocument({
+      title,
+      image,
+      body,
+      tags,
+      uid: user.uid,
+      createdBy: user.displayName,
+    });
   };
 
   return (
@@ -35,8 +52,8 @@ const CreatePost = () => {
             name="image"
             required
             placeholder="Insira uma imagem que representa seu post"
-            onChange={(e) => setImage(e.target.value)}
             value={image}
+            onChange={(e) => setImage(e.target.value)}
           />
         </label>
         <label>
@@ -45,8 +62,8 @@ const CreatePost = () => {
             name="body"
             required
             placeholder="Insira o conteúdo do post"
-            onChange={(e) => setBody(e.target.value)}
             value={body}
+            onChange={(e) => setBody(e.target.value)}
           ></textarea>
         </label>
         <label>
@@ -56,12 +73,11 @@ const CreatePost = () => {
             name="tags"
             required
             placeholder="Insira as tags separadas por vírgula"
-            onChange={(e) => setTags(e.target.value)}
             value={tags}
+            onChange={(e) => setTags(e.target.value)}
           />
         </label>
-        <button className="btn">Criar post!</button>
-        {/* {!response.loading && <button className="btn">Criar post!</button>}
+        {!response.loading && <button className="btn">Criar post!</button>}
         {response.loading && (
           <button className="btn" disabled>
             Aguarde.. .
@@ -69,7 +85,7 @@ const CreatePost = () => {
         )}
         {(response.error || formError) && (
           <p className="error">{response.error || formError}</p>
-        )} */}
+        )}
       </form>
     </div>
   );
